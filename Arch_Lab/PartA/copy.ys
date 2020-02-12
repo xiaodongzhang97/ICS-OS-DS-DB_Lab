@@ -1,0 +1,44 @@
+# Execution begins at address 0
+        .pos 0
+        irmovq stack, %rsp 	# stack pointer
+        call main          	# Execute main program
+        halt               	# Terminate program
+		
+		.align 8
+# Source block
+src:
+		.quad 0x00a
+		.quad 0x0b0
+		.quad 0xc00
+# Destination block
+dest:
+		.quad 0x111
+		.quad 0x222
+		.quad 0x333
+main:
+        irmovq src, %rdi    # 第一参数
+        irmovq dest, %rsi	# 第二参数
+		irmovq $3, %rdx		# 第三参数
+		call copy_block
+        ret
+# long copy_block(long *src, long *dest, long len)
+# src,dest,len store in %rdi,%rsi,%rdx
+copy_block:
+        irmovq $0, %rax      # 初始化%rax存储返回值
+		irmovq $1, %r8		 # 存入要参与运算的常数
+		irmovq $8, %r9		 # 存入要参与运算的常数
+loop:
+		andq %rdx, %rdx	     # 判断len是否大于0
+		je loopend		     # 如果len等于0则跳出循环
+		mrmovq 0(%rdi), %r10 # 将src的值放入%r10，即val=*src
+        addq %r9, %rdi 		 # 调整src指向下一位，即src++(src += 8)
+        rmmovq %r10, (%rsi)  # 将val的值存入dest指向的位置
+		addq %r9, %rsi       # 调整dest指向下一位
+		xorq %r10, %rax		 # result ^= val
+		subq %r8, %rdx		 # len -= 1
+		jmp loop
+loopend:
+		ret
+# Stack starts here and grows to lower address
+        .pos 0x200           
+stack:

@@ -1,0 +1,37 @@
+# Execution begins at address 0
+        .pos 0
+        irmovq stack, %rsp 	# stack pointer
+        call main          	# Execute main program
+        halt               	# Terminate program
+# Sample linked list
+        .align 8
+ele1:
+        .quad 0x00a
+        .quad ele2
+ele2:
+        .quad 0x0b0
+        .quad ele3
+ele3:
+        .quad 0xc00
+        .quad 0
+main:
+        irmovq ele1, %rdi    # 用 %rdi 来传递参数
+        call rsum_list
+        ret
+# long sum_list(list_ptr ls)
+# ls store in %rdi
+rsum_list:
+		pushq %r8			 # 将上层存在%r8中的数据入栈
+        irmovq $0, %rax      # 初始化%rax存储返回值
+		andq %rdi, %rdi	     # 判断当前指针是否为空
+		je rend		     	 # 如果指针为空则直接返回
+		mrmovq 0(%rdi), %r8  # 将本层的值放入%r8
+        mrmovq 8(%rdi), %rdi # 调整%rdi指向下一个节点
+        call rsum_list       # 递归调用函数
+        addq %r8, %rax       # 计算当前值和后面值之和作为返回值
+rend:
+		popq %r8			 # 回复上一层在%r8中的数据
+		ret
+# Stack starts here and grows to lower address
+        .pos 0x200           
+stack:
