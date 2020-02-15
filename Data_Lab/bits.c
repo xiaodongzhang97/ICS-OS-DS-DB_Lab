@@ -11,7 +11,7 @@ int tmin(void){
 //是否为补码最大值 即01111...
 int isTmax(int x){
 	int y = ~(x + x + 1);
-	int z = !(x + 1);
+	int z = !(x+1);
 	return !(y+z);
 }
 
@@ -46,9 +46,9 @@ int conditional(int x, int y, int z) {
 //实现<=
 int isLessOrEqual(int x, int y) {
 	int negx = ~x + 1;
-	int z = (y + negx) >> 31;	
-	int xsign = x >> 31;   
-	int ysign = y >> 31;   
+	int z = (y + negx) >> 31;
+	int xsign = x >> 31;
+	int ysign = y >> 31;
 	int sXor = xsign^ysign;
 	return (!z & !sXor) | !~(xsign & ~ysign);
 }
